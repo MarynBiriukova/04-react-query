@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react'
 import './App.module.css'
 
 import { fetchMovies } from '../../services/movieService.ts';
@@ -23,12 +24,29 @@ const toastConfig = {
 
 
 function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  //const [movies, setMovies] = useState<Movie[]>([]);
   const [query, setQuery] = useState<string>('');
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);// для модалки
-  const [isLoading, setisLoading] = useState<boolean>(false);
-  const [isEr, setisEr] = useState<boolean>(false);
+ // const [isLoading, setisLoading] = useState<boolean>(false);
+  //const [isEr, setisEr] = useState<boolean>(false);
+
   
+
+
+  const { data: movies = [], error, isLoading, isError } = useQuery({
+  queryKey: ['movies', query],
+  queryFn: () => fetchMovies(query).then((data) => {
+    if (!data.length) {
+      toast.error('No movies found for your request.', { ...toastConfig });
+    }
+    
+    return data; // 🌟 ОБЯЗАТЕЛЬНО ДОБАВЬТЕ ЭТУ СТРОКУ!
+  }),
+  enabled: !!query.trim(),
+});
+
+
+  /*
   useEffect(() => {
 
     if (!query.trim()) return;
@@ -48,13 +66,15 @@ function App() {
         setisEr(true);
         console.error("Помилка при отриманні фільмів:", err);
       });
-  }, [query]); 
+  }, [query]);
+  
+  */
 
   const handleSubmit = (searchQuery: string) => {
 
-    setisEr(false); 
-    setMovies([]);
-    setisLoading(true);
+    //setisEr(false); 
+    //setMovies([]);
+    //setisLoading(true);
     
     setQuery(searchQuery); 
   };
@@ -70,8 +90,8 @@ function App() {
       <Toaster position="top-center" reverseOrder={false} />
       <SearchBar onSubmit={handleSubmit} />
       {isLoading && <Loader />}
-      {isEr && <ErrorMessage />}
-      {!isLoading && !isEr && <MovieGrid onSelect={handleSelect} movies={movies} />}
+      {isError && <ErrorMessage />}
+      {!isLoading && !isError && <MovieGrid onSelect={handleSelect} movies={movies} />}
       {selectedMovie && (
       <MovieModal 
         movie={selectedMovie} 
