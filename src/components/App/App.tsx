@@ -2,8 +2,8 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useState } from 'react'
 import styles from './App.module.css'
 
-import { fetchMovies } from '../../services/movieService.ts';
-import type { Movie } from '../../types/movie.ts';
+import { fetchMovies } from '../../services/movieService';
+import type { Movie } from '../../types/movie';
 import { Toaster, toast } from 'react-hot-toast';
 
 import SearchBar from '../SearchBar/SearchBar.tsx';
