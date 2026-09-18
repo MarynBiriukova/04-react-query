@@ -24,7 +24,6 @@ const toastConfig = {
     color: '#000',
   },
 };
-
 /****************************************************** */
 interface PaginationProps {
   totalPages: number;
