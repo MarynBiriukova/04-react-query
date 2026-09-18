@@ -13,7 +13,4 @@ export default defineConfig({
     sourcemap: true,
   },
 
-  define: {
-      'import.meta.env.VITE_TMDB_TOKEN': JSON.stringify(env.VITE_TMDB_TOKEN)
-    }
 })
