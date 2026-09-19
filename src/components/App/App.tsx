@@ -1,5 +1,5 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './App.module.css'
 
 import { fetchMovies } from '../../services/movieService';
@@ -64,9 +64,9 @@ function App() {
   queryKey: ['movies', query, currentPage],
     queryFn: async () => {
       const res = await fetchMovies(query, currentPage);
-      if (!res?.results?.length) {
-      toast.error('No movies found for your request.', { ...toastConfig });
-    }
+     // if (!res?.results?.length) {
+     // toast.error('No movies found for your request.', { ...toastConfig });
+      //}
     
     return res; 
   },
@@ -74,6 +74,15 @@ function App() {
     enabled: !!query.trim(),
     placeholderData: keepPreviousData, 
   });
+
+
+  useEffect(() => {
+    if (isSuccess && data && data.results.length === 0) {
+      toast.error('No movies found for your request.', { ...toastConfig });
+    }
+  }, [isSuccess, data]);
+
+
   
   const movies = data?.results || [];
   const totalPages = data?.total_pages ? Math.min(data.total_pages, 500) : 0;
@@ -95,6 +104,10 @@ function App() {
       <Toaster position="top-center" reverseOrder={false} />
       <SearchBar onSubmit={handleSubmit} />
       
+      
+      {isLoading && <Loader />}
+      {isError && <ErrorMessage />}
+
       {isSuccess && totalPages > 1 && (
         <Pagination
           totalPages={totalPages}
@@ -102,8 +115,7 @@ function App() {
           onPageChange={setCurrentPage}
         />
       )}
-      {isLoading && <Loader />}
-      {isError && <ErrorMessage />}
+
       {!isLoading && !isError && movies.length > 0 && <MovieGrid onSelect={handleSelect} movies={movies} />}
       {selectedMovie && (
       <MovieModal 
